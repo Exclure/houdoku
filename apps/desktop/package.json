@@ -22,7 +22,8 @@
     ],
     "mac": {
       "target": ["dmg"],
-      "arch": ["x64", "arm64"],  // Add this to build universal/fat binary
+      "_note_arch": "Build universal/fat binary",
+      "arch": ["x64", "arm64"],
       "type": "development",
       "hardenedRuntime": false,
       "identity": null,
