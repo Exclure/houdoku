@@ -1,0 +1,74 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which platform do you want to build?"
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - windows
+          - linux
+          - mac
+
+      build_type:
+        description: "Build type"
+        type: choice
+        required: true
+        default: release
+        options:
+          - release
+          - debug
+
+      node_version:
+        description: "Node version"
+        type: choice
+        required: true
+        default: "22"
+        options:
+          - "20"
+          - "22"
+
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            build_cmd: pnpm dist:win
+          - os: ubuntu-latest
+            platform: linux
+            build_cmd: pnpm dist:linux
+          - os: macos-latest
+            platform: mac
+            build_cmd: pnpm dist:mac
+
+    # Only run the selected platform OR all
+    if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ github.event.inputs.node_version }}
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: ${{ matrix.build_cmd }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_TYPE: ${{ github.event.inputs.build_type }}
