@@ -21,9 +21,8 @@
       "out/**/*"
     ],
     "mac": {
-      "target": [
-        "dmg"
-      ],
+      "target": ["dmg"],
+      "arch": ["x64", "arm64"],  // Add this to build universal/fat binary
       "type": "development",
       "hardenedRuntime": false,
       "identity": null,
