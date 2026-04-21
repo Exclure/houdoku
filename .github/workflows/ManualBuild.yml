@@ -1,5 +1,4 @@
 name: Publish
-
 on:
   workflow_dispatch:
     inputs:
@@ -49,10 +48,14 @@ jobs:
             platform: mac
             build_cmd: pnpm dist:mac
 
-    # Only run the selected platform OR all
-    if: ${{ github.event.inputs.target == 'all' || github.event.inputs.target == matrix.platform }}
+    # Filter matrix entries here
+    continue-on-error: false
 
     steps:
+      - name: Skip if platform doesn't match
+        if: ${{ github.event.inputs.target != 'all' && github.event.inputs.target != matrix.platform }}
+        run: echo "Skipping this platform" && exit 0
+
       - uses: actions/checkout@v4
 
       - name: Install pnpm
